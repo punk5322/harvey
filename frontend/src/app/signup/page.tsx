@@ -83,8 +83,12 @@ export default function SignupPage() {
             setTimeout(() => {
                 router.push("/assistant");
             }, 2000);
-        } catch (error: any) {
-            setError(error.message || "An error occurred during signup");
+        } catch (error: unknown) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : "An error occurred during signup";
+            setError(message);
         } finally {
             setLoading(false);
         }

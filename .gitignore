@@ -16,3 +16,20 @@ next-env.d.ts
 .DS_Store
 .vercel
 coverage
+
+# Added by the Mac->Linux transfer (2026-11-10): secrets, data dumps and build output never go to git.
+!.env.sample
+!.env.template
+*.pem
+*.key
+*.p12
+*.dump
+*.sql.gz
+*.bak.sql
+node_modules/
+.next/
+dist/
+.netlify/
+.vercel/
+.turbo/
+${CLAUDE_PLUGIN_DATA}/

@@ -12,7 +12,14 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "src/scripts/**",
   ]),
+  // react-hooks/set-state-in-effect prohibits common, valid sync patterns (e.g. hydrating form fields from fetched props).
+  {
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

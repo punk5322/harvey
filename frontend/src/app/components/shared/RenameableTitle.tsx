@@ -15,9 +15,23 @@ export function RenameableTitle({ value, onCommit, suffix }: Props) {
     const escaped = useRef(false);
 
     function startEditing(e: React.MouseEvent) {
-        const doc = document as any;
-        const caret = doc.caretPositionFromPoint?.(e.clientX, e.clientY);
-        const range = !caret && doc.caretRangeFromPoint?.(e.clientX, e.clientY);
+        const docEl = document as Document & {
+            caretPositionFromPoint?: (
+                cx: number,
+                cy: number,
+            ) => { offset: number } | null;
+            caretRangeFromPoint?: (
+                cx: number,
+                cy: number,
+            ) => Range | null;
+        };
+        const caret = docEl.caretPositionFromPoint?.(
+            e.clientX,
+            e.clientY,
+        );
+        const range =
+            !caret &&
+            docEl.caretRangeFromPoint?.(e.clientX, e.clientY);
         caretPos.current = caret ? caret.offset : range ? range.startOffset : null;
         escaped.current = false;
         setDraft(value);

@@ -28,7 +28,7 @@ export default function LoginPage() {
         setError(null);
 
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const { error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
@@ -36,8 +36,12 @@ export default function LoginPage() {
             if (error) throw error;
 
             router.push("/assistant");
-        } catch (error: any) {
-            setError(error.message || "An error occurred during login");
+        } catch (error: unknown) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : "An error occurred during login";
+            setError(message);
         } finally {
             setLoading(false);
         }

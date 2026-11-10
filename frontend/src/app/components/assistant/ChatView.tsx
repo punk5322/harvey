@@ -346,17 +346,27 @@ export function ChatView({
     }, []);
 
     useEffect(() => {
-        if (latestUserMessageRef.current) {
-            const headerHeight = window.innerWidth < 768 ? 56 : 0;
-            const gap = window.innerWidth < 768 ? 16 : 24;
-            const paddingBottom = 128;
-            const marginBottom = 48;
-            const userMessageHeight = latestUserMessageRef.current.offsetHeight;
-            setMinHeight(
-                `calc(100dvh - ${headerHeight + gap + userMessageHeight + paddingBottom + marginBottom}px)`,
-            );
-        }
-    }, [messages.length, latestUserMessageRef.current]); // eslint-disable-line react-hooks/exhaustive-deps
+        let cancelled = false;
+        const measure = () => {
+            requestAnimationFrame(() => {
+                if (cancelled) return;
+                const latest = latestUserMessageRef.current;
+                if (!latest) return;
+                const headerHeight = window.innerWidth < 768 ? 56 : 0;
+                const gap = window.innerWidth < 768 ? 16 : 24;
+                const paddingBottom = 128;
+                const marginBottom = 48;
+                const userMessageHeight = latest.offsetHeight;
+                setMinHeight(
+                    `calc(100dvh - ${headerHeight + gap + userMessageHeight + paddingBottom + marginBottom}px)`,
+                );
+            });
+        };
+        measure();
+        return () => {
+            cancelled = true;
+        };
+    }, [messages.length]);
 
     const updateScrollButton = useCallback(() => {
         const c = messagesContainerRef.current;
@@ -430,7 +440,7 @@ export function ChatView({
                 setMessagesVisible(true);
             }
         }
-    }, [messages]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [messages]);
 
     useEffect(() => {
         if (panelMounted && window.innerWidth < 768) {
@@ -494,8 +504,8 @@ export function ChatView({
                                         {msg.role === "user" ? (
                                             <UserMessage
                                                 content={msg.content ?? ""}
-                                                files={(msg as any).files}
-                                                workflow={(msg as any).workflow}
+                                                files={msg.files}
+                                                workflow={msg.workflow}
                                             />
                                         ) : (
                                             <AssistantMessage
@@ -505,11 +515,10 @@ export function ChatView({
                                                     i === messages.length - 1 &&
                                                     isResponseLoading
                                                 }
-                                                isError={!!(msg as any).error}
+                                                isError={!!msg.error}
                                                 errorMessage={
-                                                    typeof (msg as any).error ===
-                                                    "string"
-                                                        ? (msg as any).error
+                                                    typeof msg.error === "string"
+                                                        ? msg.error
                                                         : undefined
                                                 }
                                                 annotations={msg.annotations}
